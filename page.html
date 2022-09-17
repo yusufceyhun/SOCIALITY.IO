@@ -1,0 +1,317 @@
+<div class="d-flex mb-1 align-items-start justify-content-between mb-4">
+    <div class="d-flex status">
+        <div class="d-flex align-items-center text-secondary mx-2">
+            <i class="fa fa-solid fa-circle"></i>
+            <span class="mx-2">Published</span>
+        </div>
+        <div class="d-flex align-items-center text-success mx-2">
+            <i class="fa fa-solid fa-circle"></i>
+            <span class="mx-2">Scheduled</span>
+        </div>
+        <div class="d-flex align-items-center text-warning mx-2">
+            <i class="fa fa-solid fa-circle"></i>
+            <span class="mx-2">Need Approval</span>
+        </div>
+        <div class="d-flex align-items-center text-danger mx-2">
+            <i class="fa fa-solid fa-circle"></i>
+            <span class="mx-2">Error</span>
+        </div>
+        <div class="d-flex align-items-center text-primary mx-2">
+            <i class="fa fa-solid fa-circle"></i>
+            <span class="mx-2">Notes</span>
+        </div>
+    </div>
+    <div class="d-flex flex-column p-2 rounded-pill shadow-lg bg-info position-fixed" id="profile-button">
+        <div class="d-flex align-items-center justify-content-center">
+            <img src="/img/ycv.jpg" class="rounded-circle mx-2 shadow-sm border border-dark" width="50" height="50"
+                alt="">
+            <i class="fa fa-solid fa-chevron-down px-2 mr-2 text-white"></i>
+        </div>
+        <div class="menu shadow d-flex flex-column position-absolute bg-info">
+            <a href="#" class="text-decoration-none text-white">Profile</a>
+            <a href="#" class="text-decoration-none text-white">Settings</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="contents">
+
+</div>
+
+
+<style>
+    .posts-post {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+
+    }
+
+    .status {
+        font-size: 0.8em !important;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .status {
+            flex-direction: column;
+        }
+
+        .posts-post {
+            justify-content: center;
+            flex-wrap: nowrap;
+            flex-direction: column;
+        }
+
+        .post {
+            margin-right: 0em !important;
+        }
+    }
+
+    .description {
+        font-size: 0.8em !important;
+    }
+
+    .post {
+        max-width: 400px !important;
+        margin-bottom: 2em;
+        margin-right: 2em;
+        transition: all 0.4s ease;
+    }
+
+    .post:hover {
+        border-color: orangered !important;
+        max-width: 410px !important;
+    }
+
+    .rounded {
+        border-radius: 0.75em !important;
+    }
+
+    #post-img {
+        width: 100%;
+        max-height: 250px;
+        object-fit: contain;
+        background-color: rgb(248, 248, 248);
+    }
+
+    .fa-trash,
+    .fa-ban,
+    .fa-sliders,
+    .fa-thumbs-up,
+    .fa-comment,
+    .fa-share {
+        transition: all 0.2s ease;
+        pointer-events: all;
+        cursor: pointer;
+    }
+
+    .fa-trash:hover,
+    .fa-ban:hover,
+    .fa-sliders:hover {
+        color: #222;
+    }
+
+    .like {
+        color: rgb(247, 30, 30) !important;
+    }
+
+    #profile-button {
+        cursor: pointer;
+        right: 2em;
+        width: 100px;
+    }
+
+    .menu {
+        width: 100px;
+        z-index: -1;
+        padding: 1em;
+        right: 1px;
+        border-radius: 2em;
+        transition: all 0.5s ease;
+        opacity: 0;
+    }
+
+    .menu a:hover {
+        color: yellow !important;
+    }
+
+    .menu-clicked {
+        z-index: 5;
+        margin-top: 4em;
+        opacity: 1;
+    }
+
+    .fa.fa-image {
+        font-weight: 300 !important;
+        font-size: 1.5em;
+    }
+</style>
+
+
+<script>
+    var isMenuClicked = false
+    $("#profile-button").click(function () {
+        if (!isMenuClicked) {
+            $("#profile-button .menu").addClass("menu-clicked")
+            $("#profile-button .fa-solid").removeClass("fa-chevron-down")
+            $("#profile-button .fa-solid").addClass("fa-chevron-up")
+            isMenuClicked = true
+        }
+        else {
+            $("#profile-button .menu").removeClass("menu-clicked")
+            $("#profile-button .fa-solid").addClass("fa-chevron-down")
+            $("#profile-button .fa-solid").removeClass("fa-chevron-up")
+            isMenuClicked = false
+        }
+    })
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.0/moment.min.js"></script>
+<script>
+
+
+    fetch("./data.json")
+        .then(response => {
+            return response.json();
+        })
+        .then(jsondata => {
+            console.log()
+            var dates = (Object.keys(jsondata.posts_by_date));
+            dates.forEach(getDates)
+            function getDates(item, index, arr) {
+                arr[index] = item
+                var date = item
+                let dateh4 = document.createElement('h4')
+                dateh4.classList.add("text-muted")
+                dateh4.classList.add("mt-2")
+                var longDateStr = moment(date, 'Y/M/D').format('MMMM Y');
+                var longDateStr2 = moment(date, 'Y/M/D').format('D MMMM YYYY');
+                dateh4.innerText = longDateStr
+                var contentDivs = `    <div class="d-flex posts flex-column d${date}">
+                                                <div class="date">
+                                            
+                                                </div>
+                                                <div class="posts-post d-flex">
+                                                
+                                                </div>
+                                            </div>`
+                var contents = document.querySelector(".contents")
+                contents.innerHTML += contentDivs
+                $(`.d${date} .date`).append(dateh4)
+
+                var data = jsondata.posts_by_date[date]
+                console.log(data)
+                for (let i = 0; i < data.length; i++) {
+                    var accountName = data[i].account.name
+                    console.log(accountName)
+                    var type = data[i].entry.type
+                    console.log(type)
+                    var image = data[i].entry.image
+                    console.log(image)
+                    var message = data[i].entry.message
+                    console.log(message)
+                    var is_published = data[i].is_published
+                    console.log(is_published)
+                    var link = data[i].link
+                    console.log(link)
+                    var status = data[i].status
+                    console.log(status)
+
+                    if (link == undefined) {
+                        link = "index.html"
+                    }
+
+                    var statusDiv
+                    var borderStatusClass
+
+                    switch (status) {
+                        case 0:
+                            statusDiv = `<div class="d-flex rounded-circle bg-success status">
+                                                    <i class="fa fa-image text-white m-2"></i>
+                                                </div>`
+                            break;
+                        case 1:
+                            statusDiv = `<div class="rounded-circle bg-danger status">
+                                                    <i class="fa fa-regular fa-image text-white m-2"></i>
+                                                </div>`
+                            break;
+                        case 2:
+                            statusDiv = `<div class="rounded-circle bg-primary status">
+                                                    <i class="fa fa-regular fa-image text-white m-2"></i>
+                                                </div>`
+                            break;
+                        case 3:
+                            statusDiv = `<div class="rounded-circle bg-secondary status">
+                                                    <i class="fa fa-regular fa-image text-white m-2"></i>
+                                                </div>
+                                                `
+                            break;
+                        default:
+                            statusDiv = `<div class="rounded-circle bg-secondary status">
+                                                    <i class="fa fa-regular fa-image text-white m-2"></i>
+                                                </div>
+                                                `
+                            break;
+                    }
+
+                    var postcard = `<div class="rounded p-4 pb-2 rounded bg-white shadow border border-dark-50 post ">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                ${statusDiv}
+                                                <div class="actions d-flex text-secondary">
+                                                    <i class="fa fa-solid fa-trash mx-2"></i>
+                                                    <i class="fa fa-solid fa-ban mx-2"></i>
+                                                    <i class="fa fa-solid fa-sliders mx-2"></i>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-column mt-4 justify-content-center">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="d-flex">
+                                                        <img src="/img/guerrillabuzz-crypto-pr-hphA7EHLHR4-unsplash.jpg" class="rounded" width="50px"
+                                                            height="50px" alt="">
+                                                        <div class="mx-2">
+                                                            <p class="fw-bold m-0">${accountName}</p>
+                                                            <p class="text-black-50 text-sm-start mt-1 publish-date">${longDateStr2}</p>
+                                                        </div>
+                                                    </div>
+                                                    <small class="d-flex text-secondary align-items-baseline share">
+                                                        <i class="fa fa-regular fa-eye mt-sm-1"></i>
+                                                        <span class="text-dark-50 mx-2">6</span>
+                                                    </small>
+                                                </div>
+
+                                                <div>
+                                                    <p class="text-secondary description">${message}
+                                                    </p>
+                                                    <p class="mt-2"><a href="${link}" class="text-decoration-none text-primary description">Social Media</a></p>
+                                                    <img src="${image}" onerror="this.src='/img/no-post-image.png'"  alt="" class="rounded-3" id="post-img">
+
+                                                    <small class="d-flex mt-4">
+                                                        <div class="d-flex text-secondary mx-2 align-items-baseline like">
+                                                            <i class="fa fa-regular fa-heart mt-sm-1"></i>
+                                                            <p class="text-dark-50 mx-1">142</p>
+                                                        </div>
+                                                        <div class="d-flex text-secondary mx-2 align-items-baseline comment">
+                                                            <i class="fa fa-regular fa-comment mt-sm-1"></i>
+                                                            <p class="text-dark-50 mx-1">4 </p>
+                                                        </div>
+                                                        <div class="d-flex text-secondary mx-2 align-items-baseline share">
+                                                            <i class="fa fa-regular fa-share mt-sm-1"></i>
+                                                            <p class="text-dark-50 mx-1">6</p>
+                                                        </div>
+                                                    </small>
+
+
+                                                </div>
+                                            </div>
+                                </div>`
+
+                    var div = document.querySelector(`.d${date} .posts-post`);
+                    div.innerHTML += postcard;
+                }
+            }
+        }
+        );
+
+
+
+</script>
